@@ -16,7 +16,7 @@ def pdf_to_documents(file_path):
     content = read_pdf(file_path)
     return [Document(page_content=content)]
 
-file_path = "E:/llm/qw.pdf"
+file_path = "E:/llm/liulang.pdf"
 raw_documents = pdf_to_documents(file_path)
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
