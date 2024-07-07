@@ -164,3 +164,4 @@ vectorstore = Chroma.from_texts(
 )
 vectorstore.persist() 
 ```
+### 2.In production
