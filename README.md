@@ -82,4 +82,39 @@ Let's look at it separately.
  <img alt="flow chart" height="px150" src="https://python.langchain.com/v0.2/assets/images/rag_indexing-8160f90a90a33253d0154659cf7d453f.png">
 </div>
 
-#### Load
+#### 1.Load
+Langchain provides many built-in document loaders<a href="https://python.langchain.com/v0.2/docs/how_to/#document-loaders/" target="_blank">(Documents-loaders)</a>.
+
+A document is a dictionary containing text and raw data. Here, we use PyMuPDF to process the content in PDF files better.
+```bash
+import fitz  # PyMuPDF
+
+def read_pdf(file_path):
+    doc = fitz.open(file_path)
+    content = ""
+    for page_num in range(len(doc)):
+        page = doc.load_page(page_num)
+        content += page.get_text()
+    return content
+
+def pdf_to_documents(file_path):
+    content = read_pdf(file_path)
+    return [Document(page_content=content)]
+
+file_path = "your storage location/liulang.pdf"
+raw_documents = pdf_to_documents(file_path)
+```
+#### 2.Split/Chunk
+Document Chunking:Because the original document is too long to be directly input into our large model, the document needs to be cut into small pieces first. Langchain also provides many built-in text segmentation tools. Here we use RecursiveCharacterTextSplitter, set chunk_size to 500, and chunk_overlap to 50 to ensure text continuity between chunks.
+
+Langchain also provides a variety of text-splitter for you to choose.<a href="https://python.langchain.com/v0.2/docs/how_to/#text-splitters">(Text Splitters)</a>.
+
+🟢BTW:This is a very useful little tool that can clearly see text chunking case.<a href="https://chunkviz.up.railway.app/">(Chunkviz)</a>.
+```bash
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+all_splits = text_splitter.split_documents(raw_documents)
+```
+#### 3.Embed
+Embedding:To enable semantic search over text blocks, we need to generate vector embeddings for each block and then store them together with their embeddings. Ollama’s embedding model used here.
