@@ -88,12 +88,13 @@ Let's look at it separately.
  <img alt="flow chart" height="px150" src="https://python.langchain.com/v0.2/assets/images/rag_indexing-8160f90a90a33253d0154659cf7d453f.png">
 </div>
 
-#### 1.Load
+#### a.Load
 Langchain provides many built-in document loaders<a href="https://python.langchain.com/v0.2/docs/how_to/#document-loaders/" target="_blank">(Documents-loaders)</a>.
 
 A document is a dictionary containing text and raw data. Here, we use PyMuPDF to process the content in PDF files better.
 ```bash
 import fitz  # PyMuPDF
+from langchain.schema import Document
 
 def read_pdf(file_path):
     doc = fitz.open(file_path)
@@ -110,7 +111,7 @@ def pdf_to_documents(file_path):
 file_path = "your storage location/liulang.pdf"
 raw_documents = pdf_to_documents(file_path)
 ```
-#### 2.Split/Chunk
+#### b.Split/Chunk
 Document Chunking:Text splitter will split files or text into chunks to prevent the file information from exceeding LLM tokens. The tools commonly used in this step are RecursiveCharacterTextSplitter and CharacterTextSplitter. The difference is that RecursiveCharacterTextSplitter will also recursively split the text into smaller blocks if the block size exceeds the specified threshold.
 
 🔸chunk_size: Determines the maximum number of characters in each chunk when splitting text. It specifies the size or length of each block.
@@ -128,5 +129,38 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 all_splits = text_splitter.split_documents(raw_documents)
 ```
-#### 3.Embed
-Embedding:To enable semantic search over text blocks, we need to generate vector embeddings for each block and then store them together with their embeddings. Ollama’s embedding model used here.
+#### c.Embed
+Embedding:Then use Embedding to convert the chunk text divided in previous step into vectors. LangChain provides many Embedding model interfaces, such as OpenAI, Cohere, Hugging Face, Weaviate, etc. You can refer to the LangChain official website.<a href="https://python.langchain.com/v0.2/docs/how_to/#embedding-models">(Embedding)</a>.
+
+Ollama’s embedding model used here.
+
+```bash
+from langchain_community.embeddings import OllamaEmbeddings
+
+embedding_model = OllamaEmbeddings()
+```
+#### d.Vector Stores
+
+Store:We will store the results after Embedding in VectorDB. Common VectorDBs include Chroma, Pinecone, FAISS, etc. Here I use Chroma to implement it. Chroma is well integrated with LangChain, and you can directly use LangChain's interface.<a href="<a href="https://python.langchain.com/v0.2/docs/how_to/#vector-stores">(Vector-stores)</a>.
+
+Extracts the text content of each document from the list all_splits containing multiple Document objects and stores the content in the list texts .
+```bash
+texts = [doc.page_content for doc in all_splits]
+```
+Persistence storage path of vector database
+```bash
+persist_directory = 'your storage location/chroma_db'
+```
+This code uses the Chroma class to convert the text list texts into vectors, stores these vectors in a collection named "RAG_chroma", the storage path is 'your storage location/chroma_db', and calls the persist method to persist the data
+```bash
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.vectorstores import Chroma
+
+vectorstore = Chroma.from_texts(
+    texts=texts,
+    embedding=embedding_model,
+    collection_name="RAG_chroma",
+    persist_directory=persist_directory
+)
+vectorstore.persist() 
+```
