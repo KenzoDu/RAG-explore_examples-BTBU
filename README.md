@@ -3,6 +3,12 @@ This example is a preliminary exploration of later work. It uses framework tools
 ### What is RAG?
 LLMs can reason about wide-ranging topics, but their knowledge is limited to the public data up to a specific point in time that they were trained on. If you want to build AI applications that can reason about private data or data introduced after a model's cutoff date, you need to augment the knowledge of the model with the specific information it needs. The process of bringing the appropriate information and inserting it into the model prompt is known as Retrieval Augmented Generation (RAG).
 
+🔷Retrieve:User questions are used to retrieve relevant context from external knowledge bases. To do this, the user query will be embedded in the same vector space as the "context in the vector database", and then a similarity search will be done in this space to return the top k data objects in the database that are most similar to the query.
+
+🔷Augment:User queries and retrieved content are stuffed into a prompt template.
+
+🔷Generate:Finally, the retrieval-enhanced cues are fed into the LLM.
+
 ## Preliminary work
 
 <div align="left side">
@@ -105,7 +111,13 @@ file_path = "your storage location/liulang.pdf"
 raw_documents = pdf_to_documents(file_path)
 ```
 #### 2.Split/Chunk
-Document Chunking:Because the original document is too long to be directly input into our large model, the document needs to be cut into small pieces first. Langchain also provides many built-in text segmentation tools. Here we use RecursiveCharacterTextSplitter, set chunk_size to 500, and chunk_overlap to 50 to ensure text continuity between chunks.
+Document Chunking:Text splitter will split files or text into chunks to prevent the file information from exceeding LLM tokens. The tools commonly used in this step are RecursiveCharacterTextSplitter and CharacterTextSplitter. The difference is that RecursiveCharacterTextSplitter will also recursively split the text into smaller blocks if the block size exceeds the specified threshold.
+
+🔸chunk_size: Determines the maximum number of characters in each chunk when splitting text. It specifies the size or length of each block.
+
+🔸chunk_overlap: Determines the number of characters that overlap between consecutive blocks when splitting text. It specifies how much of the previous block should be included in the next block.
+
+Because the original document is too long to be directly input into our large model, the document needs to be cut into small pieces first. Langchain also provides many built-in text segmentation tools. Here we use RecursiveCharacterTextSplitter, set chunk_size to 500, and chunk_overlap to 50 to ensure text continuity between chunks.
 
 Langchain also provides a variety of text-splitter for you to choose.<a href="https://python.langchain.com/v0.2/docs/how_to/#text-splitters">(Text Splitters)</a>.
 
