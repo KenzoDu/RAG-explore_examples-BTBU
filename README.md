@@ -164,4 +164,40 @@ vectorstore = Chroma.from_texts(
 )
 vectorstore.persist() 
 ```
-### 2.In production
+### 2.Flow chart(In-production)
+
+<div align="center">
+ <img alt="overall flow chart" height="px10" src="https://python.langchain.com/v0.2/assets/images/rag_retrieval_generation-1046a4668d6bb08786ef73c56d4f228a.png">
+</div>
+
+#### z.Load(Optional)
+
+If you want to call the database at any time to implement Q&A, you must load the contents of the database first.
+
+```bash
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.vectorstores import Chroma
+
+chroma_db_path = "your storage location\chroma_db"
+embedding_model = OllamaEmbeddings()
+vectorstore = Chroma.from_texts(
+    embedding=embedding_model,
+    texts=chroma_db_path,
+    collection_name="RAG_chroma"
+)
+```
+#### 📌Tips- Sorting process
+
+Above we imported the PDF information into the DB and started the LLM service. Next we need to string together the entire RAG steps:
+
+1️⃣ Users sent QA
+
+2️⃣ Text Retrieval from Chroma_DB
+
+3️⃣ Combine QA with Text Retrieval and send to LLM
+
+4️⃣ LLM answers based on information
+
+#### a.Retriever
+
+First we need to create a Retriever, which can return corresponding files based on unstructured QA. LangChain provides many methods and integrates third-party tools. I use the Vectorstore method here. For other types, you can refer to <a href=" https://python.langchain.com/v0.2/docs/how_to/#retrievers">(Retriever)</a> .
