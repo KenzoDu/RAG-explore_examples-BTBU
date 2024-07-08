@@ -29,7 +29,7 @@ Get up and running with large language models.
 
 #### Model
 This example uses the qwen model(just 2.3G)
-```bash
+```
 pip install qwen:4b
 ```
 ### 🦜️🔗 LangChain*
@@ -37,17 +37,17 @@ pip install qwen:4b
 #### Quick Install
 
 With pip:
-```bash
+```
 pip install langchain
 ```
 With conda:
-```bash
+```
 conda install langchain -c conda-forge
 ```
 ### PyMuPDF*
 **PyMuPDF** requires **Python 3.8 or later**, install using **pip** with:
 #### Installation
-```bash
+```
 pip install PyMuPDF
 ```
 ### Chroma*
@@ -66,7 +66,7 @@ pip install PyMuPDF
 </p>
 
 
-```bash
+```
 pip install chromadb # python client
 # for javascript, npm install chromadb!
 # for client-server mode, chroma run --path /chroma_db_path
@@ -92,7 +92,7 @@ Let's look at it separately.
 Langchain provides many built-in document loaders<a href="https://python.langchain.com/v0.2/docs/how_to/#document-loaders/" target="_blank">(Documents-loaders)</a>.
 
 A document is a dictionary containing text and raw data. Here, we use PyMuPDF to process the content in PDF files better.
-```bash
+```
 import fitz  # PyMuPDF
 from langchain.schema import Document
 
@@ -123,7 +123,7 @@ Because the original document is too long to be directly input into our large mo
 Langchain also provides a variety of text-splitter for you to choose.<a href="https://python.langchain.com/v0.2/docs/how_to/#text-splitters">(Text Splitters)</a>.
 
 🟢BTW:This is a very useful little tool that can clearly see text chunking case.<a href="https://chunkviz.up.railway.app/">(Chunkviz)</a>.
-```bash
+```
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
@@ -141,18 +141,18 @@ embedding_model = OllamaEmbeddings()
 ```
 #### d.Vector Stores
 
-Store:We will store the results after Embedding in VectorDB. Common VectorDBs include Chroma, Pinecone, FAISS, etc. Here I use Chroma to implement it. Chroma is well integrated with LangChain, and you can directly use LangChain's interface.<a href="<a href="https://python.langchain.com/v0.2/docs/how_to/#vector-stores">(Vector-stores)</a>.
+Store:We will store the results after Embedding in VectorDB. Common VectorDBs include Chroma, Pinecone, FAISS, etc. Here I use Chroma to implement it. Chroma is well integrated with LangChain, and you can directly use LangChain's interface.<a href="https://python.langchain.com/v0.2/docs/how_to/#vector-stores">(Vector-stores)</a>.
 
 Extracts the text content of each document from the list all_splits containing multiple Document objects and stores the content in the list texts .
-```bash
+```
 texts = [doc.page_content for doc in all_splits]
 ```
 Persistence storage path of vector database
-```bash
+```
 persist_directory = 'your storage location/chroma_db'
 ```
 This code uses the Chroma class to convert the text list texts into vectors, stores these vectors in a collection named "RAG_chroma", the storage path is 'your storage location/chroma_db', and calls the persist method to persist the data
-```bash
+```
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
 
@@ -174,7 +174,7 @@ vectorstore.persist()
 
 If you want to call the database at any time to implement Q&A, you must load the contents of the database first.
 
-```bash
+```
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
 
@@ -200,4 +200,102 @@ Above we imported the PDF information into the DB and started the LLM service. N
 
 #### a.Retriever
 
-First we need to create a Retriever, which can return corresponding files based on unstructured QA. LangChain provides many methods and integrates third-party tools. I use the Vectorstore method here. For other types, you can refer to <a href=" https://python.langchain.com/v0.2/docs/how_to/#retrievers">(Retriever)</a> .
+First we need to create a Retriever, which can return corresponding files based on unstructured QA. LangChain provides many methods and integrates third-party tools. I use the Vectorstore method here. For other types, you can refer to <a href="https://python.langchain.com/v0.2/docs/how_to/#retrievers/">(Retriever)</a>.
+
+```
+retriever = vectorstore.as_retriever()
+```
+
+#### b.Prompt templates
+
+Prompt templates help to translate user input and parameters into instructions for a language model. This can be used to guide a model's response, helping it understand the context and generate relevant and coherent language-based output.Prompt Templates take as input a dictionary, where each key represents a variable in the prompt template to fill in.Prompt Templates output a PromptValue. This PromptValue can be passed to an LLM or a ChatModel, and can also be cast to a string or a list of messages. The reason this PromptValue exists is to make it easy to switch between strings and messages.
+
+There are a few different types of prompt templates.<a href="https://python.langchain.com/v0.2/docs/concepts/#prompt-templates">(prompt-templates)</a>.
+This example uses ChatPromptTemplate.
+
+##### b1.Template
+Template defines a structure that formats the input data (context and question) and generates a complete text template, which is then passed to a large language model (LLM) to generate the final answer.
+
+• {context}: This placeholder will be replaced by the relevant context retrieved from the vector store.
+
+• {question}: This placeholder will be replaced by the entered question from users.
+```
+template = """Answer the question with Chinese and based only on the following context:
+{context}
+
+Question: {question}
+"""
+```
+📍According to the PDF content in our example
+
+•context:“航行委员会的最新计划是增加船只数量并扩展航线。”
+
+•question:“航行委员会的计划是什么？”
+
+The template generates text formatted as follows:
+```
+Answer the question with Chinese and based only on the following context:
+航行委员会的最新计划是增加船只数量并扩展航线。
+
+Question: 航行委员会的计划是什么？
+```
+##### b2.Prompt
+
+Prompt plays the role of constructing and formatting input data in the code, so that the input data can be passed to the large language model (LLM) in a predetermined template format for processing. Specifically, prompt uses a defined template, inserts the actual context and question into the placeholder position in the template, and generates a complete input text for use by the large language model.
+
+Creates a ChatPromptTemplate instance prompt based on the previously defined template template.
+```
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_template(template)
+```
+
+#### c.LLM
+
+Instantiate a large language model llm with the model name "qwen:4b".
+
+```
+from langchain_community.llms import Ollama
+
+llm = Ollama(model="qwen:4b")
+```
+
+#### d.Chain
+
+A processing chain chain is constructed, and its workflow is as follows:
+
+1. Use RunnableParallel to handle two tasks in parallel: the problem of getting context from the retriever and passing the input.
+2. Pass the context and question to the template prompt to generate a complete answer template.
+3. Use the large language model llm to generate answers based on the template.
+4. Use StrOutputParser to parse the answer into a string.
+
+```
+from langchain_community.llms import Ollama
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+
+chain = (
+        RunnableParallel({"context": retriever, "question": RunnablePassthrough()})
+        | prompt
+        | llm
+        | StrOutputParser()
+)
+```
+
+#### e.users query and LLm answer
+
+A data model Question is defined, which contains a string root attribute __root__ to represent the input question.
+
+Configure the processing chain to accept input of type Question.
+
+Call the processing chain chain with the input question "航行委员会的计划是什么？" and print out the answer.
+```
+from langchain_core.pydantic_v1 import BaseModel
+
+class Question(BaseModel):
+    __root__: str
+chain = chain.with_types(input_type=Question)
+output = chain.invoke("航行委员会的计划是什么？")
+print(output)
+```
+
