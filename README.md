@@ -282,7 +282,7 @@ chain = (
 )
 ```
 
-#### e.users query and LLm answer
+#### e.users query and LLM answer
 
 A data model Question is defined, which contains a string root attribute __root__ to represent the input question.
 
