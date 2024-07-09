@@ -71,6 +71,9 @@ pip install chromadb # python client
 # for javascript, npm install chromadb!
 # for client-server mode, chroma run --path /chroma_db_path
 ```
+## Files Introduction
+
+
 ## Quick Start
 ### Overall flow chart
 <div align="left side">
