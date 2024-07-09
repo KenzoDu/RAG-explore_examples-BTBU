@@ -19,7 +19,7 @@ def pdf_to_documents(file_path):
     return [Document(page_content=content)]
 
 
-file_path = "/Users/mac/Documents/liulangdiqiu.pdf"
+file_path = "your storage location/liulangdiqiu.pdf"
 raw_documents = pdf_to_documents(file_path)
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=20)
