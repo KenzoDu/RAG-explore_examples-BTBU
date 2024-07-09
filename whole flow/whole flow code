@@ -1,0 +1,70 @@
+import fitz  # PyMuPDF
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.embeddings import OllamaEmbeddings
+from langchain_community.llms import Ollama
+from langchain_community.vectorstores import Chroma
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.pydantic_v1 import BaseModel
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from langchain.schema import Document
+
+
+def read_pdf(file_path):
+    doc = fitz.open(file_path)
+    content = ""
+    for page_num in range(len(doc)):
+        page = doc.load_page(page_num)
+        content += page.get_text()
+    return content
+
+
+def pdf_to_documents(file_path):
+    content = read_pdf(file_path)
+    return [Document(page_content=content)]
+
+
+file_path = "your storage location/liulangdiqiu.pdf"
+raw_documents = pdf_to_documents(file_path)
+
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=20)
+all_splits = text_splitter.split_documents(raw_documents)
+
+embedding_model = OllamaEmbeddings()
+
+texts = [doc.page_content for doc in all_splits]
+
+persist_directory = 'your storage location/chroma_db'
+
+vectorstore = Chroma.from_texts(
+    texts=texts,
+    embedding=embedding_model,
+    collection_name="RAG_chroma",
+    persist_directory=persist_directory
+)
+retriever = vectorstore.as_retriever()
+template = """Answer the question with Chinese and based only on the following context:
+{context}
+
+Question: {question}
+"""
+prompt = ChatPromptTemplate.from_template(template)
+
+llm = Ollama(model="qwen:4b")
+
+chain = (
+        RunnableParallel({"context": retriever, "question": RunnablePassthrough()})
+        | prompt
+        | llm
+        | StrOutputParser()
+)
+
+
+class Question(BaseModel):
+    __root__: str
+
+
+chain = chain.with_types(input_type=Question)
+
+output = chain.invoke("航行委员会的计划是什么？")
+print(output)
