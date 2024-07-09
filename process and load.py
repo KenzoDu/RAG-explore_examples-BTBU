@@ -4,6 +4,7 @@ from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
 from langchain.schema import Document
 
+
 def read_pdf(file_path):
     doc = fitz.open(file_path)
     content = ""
@@ -12,23 +13,23 @@ def read_pdf(file_path):
         content += page.get_text()
     return content
 
+
 def pdf_to_documents(file_path):
     content = read_pdf(file_path)
     return [Document(page_content=content)]
 
-file_path = "E:/llm/liulang.pdf"
+
+file_path = "your storage location/liulangdiqiu.pdf"
 raw_documents = pdf_to_documents(file_path)
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=20)
 all_splits = text_splitter.split_documents(raw_documents)
 
 embedding_model = OllamaEmbeddings()
 
 texts = [doc.page_content for doc in all_splits]
 
-
-persist_directory = 'E:/llm/chroma_db'
-
+persist_directory = 'your storage location/chroma_db'
 
 vectorstore = Chroma.from_texts(
     texts=texts,
@@ -36,6 +37,3 @@ vectorstore = Chroma.from_texts(
     collection_name="RAG_chroma",
     persist_directory=persist_directory
 )
-
-
-vectorstore.persist() 
