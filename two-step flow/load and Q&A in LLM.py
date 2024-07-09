@@ -7,7 +7,7 @@ from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 
 
-chroma_db_path = "/Users/mac/Documents/Code/python code/chroma_db"
+chroma_db_path = "your storage location/chroma_db"
 
 embedding_model = OllamaEmbeddings()
 
