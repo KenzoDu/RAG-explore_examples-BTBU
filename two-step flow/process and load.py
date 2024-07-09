@@ -29,7 +29,7 @@ embedding_model = OllamaEmbeddings()
 
 texts = [doc.page_content for doc in all_splits]
 
-persist_directory = '/Users/mac/Documents/Code/python code/chroma_db'
+persist_directory = 'your storage location/chroma_db'
 
 vectorstore = Chroma.from_texts(
     texts=texts,
