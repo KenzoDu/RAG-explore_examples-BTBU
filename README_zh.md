@@ -8,6 +8,7 @@
 这个例子是对后期工作的初步探索。它使用Ollama和Langchain等框架工具制作了一个简单的程序，可以插入知识库来执行RAG问答。
 ### What is RAG?
 LLM 可以推理广泛的主题，但他们的知识仅限于他们接受训练的特定时间点的公共数据。如果您想构建能够推理私有数据或模型截止日期后引入的数据的 AI 应用程序，则需要使用模型所需的特定信息来增强模型的知识。将适当的信息引入模型提示的过程称为检索增强生成 (RAG)。
+
 🔷检索:用户问题用于从外部知识库检索相关上下文。为此，用户查询将被嵌入到与“向量数据库中的上下文”相同的向量空间中，然后在此空间中进行相似性搜索，以返回数据库中最相似的前 k 个数据对象到查询。
 
 🔷增强:用户查询和检索的内容被填充到提示模板中。
@@ -39,7 +40,7 @@ pip install qwen:4b
 ```
 ### 🦜️🔗 LangChain*
 
-#### Quick Install
+#### 快速安装
 
 With pip:
 ```
@@ -185,15 +186,15 @@ vectorstore = Chroma.from_texts(
     persist_directory=persist_directory
 )
 ```
-### 2.Flow chart(In-production)
+### 2.后期流程图
 
 <div align="center">
  <img alt="overall flow chart" height="px10" src="https://python.langchain.com/v0.2/assets/images/rag_retrieval_generation-1046a4668d6bb08786ef73c56d4f228a.png">
 </div>
 
-#### z.Load(Optional)
+#### z.装载(可选择)
 
-If you want to call the database at any time to implement Q&A, you must load the contents of the database first.
+如果想随时调用数据库实现问答，必须先加载数据库的内容。
 
 ```
 from langchain_community.embeddings import OllamaEmbeddings
@@ -207,39 +208,39 @@ vectorstore = Chroma.from_texts(
     collection_name="RAG_chroma"
 )
 ```
-#### 📌Tips- Sorting process
+#### 📌提示——梳理流程
 
-Above we imported the PDF information into the DB and started the LLM service. Next we need to string together the entire RAG steps:
+上面我们将PDF信息导入到Chroma_DB中并启动了LLM服务。接下来我们需要将整个 RAG 步骤串联起来：
 
-1️⃣ Users sent QA
+1️⃣ 用户发送请求。
 
-2️⃣ Text Retrieval from Chroma_DB
+2️⃣ 从数据库中检索文本
 
-3️⃣ Combine QA with Text Retrieval and send to LLM
+3️⃣ 将请求的问题与文本检索结合起来并发送给 LLM
 
-4️⃣ LLM answers based on information
+4️⃣ LLM根据信息来回答问题得出结果。
 
-#### a.Retriever
+#### a.检索
 
-First we need to create a Retriever, which can return corresponding files based on unstructured QA. LangChain provides many methods and integrates third-party tools. I use the Vectorstore method here. For other types, you can refer to <a href="https://python.langchain.com/v0.2/docs/how_to/#retrievers/">(Retriever)</a>.
+首先我们需要创建一个Retriever，它可以根据非结构化QA返回相应的文件。 LangChain提供了很多方法并集成了第三方工具。我这里使用Vectorstore方法。其他类型可以参考 <a href="https://python.langchain.com/v0.2/docs/how_to/#retrievers/">(Retriever)</a>.
 
 ```
 retriever = vectorstore.as_retriever()
 ```
 
-#### b.Prompt templates
+#### b.提示词模版
 
-Prompt templates help to translate user input and parameters into instructions for a language model. This can be used to guide a model's response, helping it understand the context and generate relevant and coherent language-based output.Prompt Templates take as input a dictionary, where each key represents a variable in the prompt template to fill in.Prompt Templates output a PromptValue. This PromptValue can be passed to an LLM or a ChatModel, and can also be cast to a string or a list of messages. The reason this PromptValue exists is to make it easy to switch between strings and messages.
+提示模板有助于将用户输入和参数转换为语言模型的指令。这可用于指导模型的响应，帮助其理解上下文并生成相关且连贯的基于语言的输出。提示模板将字典作为输入，其中每个键代表提示模板中要填写的变量。提示模板输出提示值。此 PromptValue 可以传递给 LLM 或 ChatModel，也可以转换为字符串或消息列表。这个 PromptValue 存在的原因是为了方便在字符串和消息之间切换。
 
-There are a few different types of prompt templates.<a href="https://python.langchain.com/v0.2/docs/concepts/#prompt-templates">(prompt-templates)</a>.
-This example uses ChatPromptTemplate.
+有几种不同类型的提示模板。<a href="https://python.langchain.com/v0.2/docs/concepts/#prompt-templates">(prompt-templates)</a>.
+此示例使用 ChatPromptTemplate。
 
-##### b1.Template
-Template defines a structure that formats the input data (context and question) and generates a complete text template, which is then passed to a large language model (LLM) to generate the final answer.
+##### b1.模版
+模板定义了一种结构，用于格式化输入数据（上下文和问题）并生成完整的文本模板，然后将其传递到大型语言模型（LLM）以生成最终答案。
 
-• {context}: This placeholder will be replaced by the relevant context retrieved from the vector store.
+• {context}: 该占位符将被从向量存储中检索到的相关上下文替换。
 
-• {question}: This placeholder will be replaced by the entered question from users.
+• {question}: 该占位符将被用户输入的问题替换。
 ```
 template = """Answer the question with Chinese and based only on the following context:
 {context}
@@ -247,24 +248,24 @@ template = """Answer the question with Chinese and based only on the following c
 Question: {question}
 """
 ```
-📍According to the PDF content in our example
+📍根据我们示例中的PDF内容
 
 •context:“航行委员会的最新计划是增加船只数量并扩展航线。”
 
 •question:“航行委员会的计划是什么？”
 
-The template generates text formatted as follows:
+该模板生成的文本格式如下：
 ```
 Answer the question with Chinese and based only on the following context:
 航行委员会的最新计划是增加船只数量并扩展航线。
 
 Question: 航行委员会的计划是什么？
 ```
-##### b2.Prompt
+##### b2.提示词
 
-Prompt plays the role of constructing and formatting input data in the code, so that the input data can be passed to the large language model (LLM) in a predetermined template format for processing. Specifically, prompt uses a defined template, inserts the actual context and question into the placeholder position in the template, and generates a complete input text for use by the large language model.
+Prompt在代码中起着构造和格式化输入数据的作用，以便输入数据能够以预定的模板格式传递到大语言模型（LLM）进行处理。具体来说，提示使用定义的模板，将实际上下文和问题插入到模板中的占位符位置，并生成完整的输入文本供大语言模型使用。
 
-Creates a ChatPromptTemplate instance prompt based on the previously defined template template.
+根据先前定义的模板创建 ChatPromptTemplate 实例提示。
 ```
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -273,7 +274,7 @@ prompt = ChatPromptTemplate.from_template(template)
 
 #### c.LLM
 
-Instantiate a large language model llm with the model name "qwen:4b".
+实例化一个大型语言模型 llm，模型名称为“qwen:4b”。
 
 ```
 from langchain_community.llms import Ollama
@@ -281,14 +282,14 @@ from langchain_community.llms import Ollama
 llm = Ollama(model="qwen:4b")
 ```
 
-#### d.Chain
+#### d.链
 
-A processing chain chain is constructed, and its workflow is as follows:
+构建一条处理链，其工作流程如下：
 
-1. Use RunnableParallel to handle two tasks in parallel: the problem of getting context from the retriever and passing the input.
-2. Pass the context and question to the template prompt to generate a complete answer template.
-3. Use the large language model llm to generate answers based on the template.
-4. Use StrOutputParser to parse the answer into a string.
+1. 使用 RunnableParallel 并行处理两个任务：从检索器获取上下文和传递输入的问题。
+2. 将上下文和问题传递给模板提示以生成完整的答案模板。
+3. 使用大语言模型llm根据模板生成答案。
+4. 使用 StrOutputParser 将答案解析为字符串。
 
 ```
 from langchain_community.llms import Ollama
@@ -303,13 +304,13 @@ chain = (
 )
 ```
 
-#### e.users query and LLM answer
+#### e.用户提问和LLM回答
 
-A data model Question is defined, which contains a string root attribute __root__ to represent the input question.
+定义了一个数据模型Question，其中包含一个字符串根属性__root__来表示输入问题。
 
-Configure the processing chain to accept input of type Question.
+配置处理链以接受问题类型的输入。
 
-Call the processing chain chain with the input question "航行委员会的计划是什么？" and print out the answer.
+输入问题“航行委员会的计划是什么？”来调用处理链，并打印出答案。
 ```
 from langchain_core.pydantic_v1 import BaseModel
 
@@ -319,14 +320,14 @@ chain = chain.with_types(input_type=Question)
 output = chain.invoke("航行委员会的计划是什么？")
 print(output)
 ```
-### 3.Results
+### 3.结果
 
-🔴In the **whole flow** code run, the running time  is **283** seconds by using **Nvida 1660ti GPU cuda**.
+🔴在**Whole flow**代码运行中，使用**Nvida 1660ti GPU cuda**，运行时间为**283**秒。
 
-Result:航行委员会的计划是为人类在未来建立新家园的过程中提供科学合理的路线、时间和空间的规划。
+结果:航行委员会的计划是为人类在未来建立新家园的过程中提供科学合理的路线、时间和空间的规划。
 
-🔴In the **whole flow** code run, the running time  is **26** seconds by using **Apple Silicon M2max GPU**.
+🔴在**Whole flow**代码运行中，使用**Apple Silicon M2max GPU**，运行时间为**26**秒。
 
-Result:航行委员会的计划是在地球绕太阳公转的过程中进行科学研究和技术开发，以期在不久的将来能够实现人类的长期和平和发展。
+结果:航行委员会的计划是在地球绕太阳公转的过程中进行科学研究和技术开发，以期在不久的将来能够实现人类的长期和平和发展。
 
-You will definitely be curious why the test results are not consistent with the answers in the original article. No doubt, this is indeed the case. This is because the final result delivered by LLM will be affected by the text segmenter and text embedding in the process, which requires special optimization and adjustment of the details of each component to obtain accurate answers.
+你肯定会好奇为什么测试结果与原文章中的答案不一致。毫无疑问，事实确实如此。这是因为LLM回答的最终结果会受到过程中文本分割器和文本嵌入的影响，这需要对每个组件的细节进行针对性的特殊优化和调整才能获得准确的答案。
