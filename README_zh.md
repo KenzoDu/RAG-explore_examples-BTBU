@@ -137,44 +137,43 @@ raw_documents = pdf_to_documents(file_path)
 #### b.分割/切块
 文档分块：文本分割器将文件或文本分割成块，以防止文件信息超过LLM令牌。这一步常用的工具有RecursiveCharacterTextSplitter和CharacterTextSplitter。不同之处在于，如果块大小超过指定阈值，RecursiveCharacterTextSplitter 也会递归地将文本分割成更小的块。
 
-🔸chunk_size: Determines the maximum number of characters in each chunk when splitting text. It specifies the size or length of each block.
+🔸chunk_size: 确定分割文本时每个块中的最大字符数。它指定每个块的大小或长度。
 
-🔸chunk_overlap: Determines the number of characters that overlap between consecutive blocks when splitting text. It specifies how much of the previous block should be included in the next block.
+🔸chunk_overlap: 确定分割文本时连续块之间重叠的字符数。它指定前一个块的多少内容应包含在下一个块中。
 
-Because the original document is too long to be directly input into our large model, the document needs to be cut into small pieces first. Langchain also provides many built-in text segmentation tools. Here we use RecursiveCharacterTextSplitter, set chunk_size to 500, and chunk_overlap to 50 to ensure text continuity between chunks.
+确定分割文本时连续块之间重叠的字符数。它指定前一个块的多少内容应包含在下一个块中。
 
-Langchain also provides a variety of text-splitter for you to choose.<a href="https://python.langchain.com/v0.2/docs/how_to/#text-splitters">(Text Splitters)</a>.
+Langchain还提供了多种文本分割器供你选择。<a href="https://python.langchain.com/v0.2/docs/how_to/#text-splitters">(Text Splitters)</a>.
 
-🟢BTW:This is a very useful little tool that can clearly see text chunking case.<a href="https://chunkviz.up.railway.app/">(Chunkviz)</a>.
+🟢BTW:这是一个非常好用的小工具，可以清楚地看到文本分块情况。<a href="https://chunkviz.up.railway.app/">(Chunkviz)</a>.
 ```
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 all_splits = text_splitter.split_documents(raw_documents)
 ```
-#### c.Embed
-Embedding:Then use Embedding to convert the chunk text divided in previous step into vectors. LangChain provides many Embedding model interfaces, such as OpenAI, Cohere, Hugging Face, Weaviate, etc. You can refer to the LangChain official website.<a href="https://python.langchain.com/v0.2/docs/how_to/#embedding-models">(Embedding)</a>.
+#### c.嵌入
+Embedding：然后使用Embedding将上一步划分的块文本转换为向量。LangChain提供了很多Embedding模型接口，比如OpenAI、Cohere、Hugging Face、Weaviate等，可以参考LangChain官网。<a href="https://python.langchain.com/v0.2/docs/how_to/#embedding-models">(Embedding)</a>.
 
-Ollama’s embedding model used here.
-
+这里使用简单方便的 Ollama嵌入模型。
 ```bash
 from langchain_community.embeddings import OllamaEmbeddings
 
 embedding_model = OllamaEmbeddings()
 ```
-#### d.Vector Stores
+#### d.向量数据库
 
-Store:We will store the results after Embedding in VectorDB. Common VectorDBs include Chroma, Pinecone, FAISS, etc. Here I use Chroma to implement it. Chroma is well integrated with LangChain, and you can directly use LangChain's interface.<a href="https://python.langchain.com/v0.2/docs/how_to/#vector-stores">(Vector-stores)</a>.
+Store：我们将Embedding后的结果存储在VectorDB中。常见的VectorDB有Chroma、Pinecone、FAISS等，这里我使用Chroma来实现。 Chroma与LangChain集成良好，您可以直接使用LangChain的界面。<a href="https://python.langchain.com/v0.2/docs/how_to/#vector-stores">(Vector-stores)</a>.
 
-Extracts the text content of each document from the list all_splits containing multiple Document objects and stores the content in the list texts .
+从包含多个 Document 对象的列表 all_splits 中提取每个文档的文本内容，并将内容存储在列表 text 中。
 ```
 texts = [doc.page_content for doc in all_splits]
 ```
-Persistence storage path of vector database
+矢量数据库持久化存储路径
 ```
 persist_directory = 'your storage location/chroma_db'
 ```
-This code uses the Chroma class to convert the text list texts into vectors, stores these vectors in a collection named "RAG_chroma", the storage path is 'your storage location/chroma_db', and calls the persist method to persist the data
+这段代码使用Chroma类将文本列表文本转换为向量，将这些向量存储在名为“RAG_chroma”的集合中，存储路径为'your storage location/chroma_db'
 ```
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
@@ -185,7 +184,6 @@ vectorstore = Chroma.from_texts(
     collection_name="RAG_chroma",
     persist_directory=persist_directory
 )
-vectorstore.persist() 
 ```
 ### 2.Flow chart(In-production)
 
