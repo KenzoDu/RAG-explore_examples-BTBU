@@ -21,7 +21,7 @@ LLMs can reason about wide-ranging topics, but their knowledge is limited to the
  <img alt="ollama" height="100px" src="https://github.com/ollama/ollama/assets/3325447/0d0b44e2-8f4a-4e99-9b52-a5c1c741c8f7">
 </div>
 
-### Ollama*
+### 🟢Ollama
 Get up and running with large language models.
 
 
@@ -38,7 +38,7 @@ This example uses the qwen model(just 2.3G)
 ```
 pip install qwen:4b
 ```
-### 🦜️🔗 LangChain*
+### 🟢LangChain🦜️🔗 
 
 #### Quick Install
 
@@ -50,13 +50,13 @@ With conda:
 ```
 conda install langchain -c conda-forge
 ```
-### PyMuPDF*
+### 🟢PyMuPDF
 **PyMuPDF** requires **Python 3.8 or later**, install using **pip** with:
 #### Installation
 ```
 pip install PyMuPDF
 ```
-### Chroma*
+### 🟢Chroma
 
 <p align="left side">
     <b>Chroma - the open-source embedding database</b>. <br />
@@ -77,7 +77,7 @@ pip install chromadb # python client
 # for javascript, npm install chromadb!
 # for client-server mode, chroma run --path /chroma_db_path
 ```
-### Python version
+### 🟢Python version
 
 It requires **Python 3.8 or later**.
 
