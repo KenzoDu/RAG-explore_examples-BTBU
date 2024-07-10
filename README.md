@@ -316,4 +316,12 @@ chain = chain.with_types(input_type=Question)
 output = chain.invoke("航行委员会的计划是什么？")
 print(output)
 ```
+### 3.Results
 
+In the **whole flow** code run, the running time  is **283** seconds by using **Nvida 1660ti GPU cuda**.
+Result:航行委员会的计划是为人类在未来建立新家园的过程中提供科学合理的路线、时间和空间的规划。
+
+In the **whole flow** code run, the running time  is **26** seconds by using **Apple Silicon M2max GPU**.
+Result:航行委员会的计划是在地球绕太阳公转的过程中进行科学研究和技术开发，以期在不久的将来能够实现人类的长期和平和发展。
+
+You will definitely be curious why the test results are not consistent with the answers in the original article. No doubt, this is indeed the case. This is because the final result delivered by LLM will be affected by the text segmenter and text embedding in the process, which requires special optimization and adjustment of the details of each component to obtain accurate answers.
