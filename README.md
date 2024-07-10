@@ -75,7 +75,7 @@ pip install chromadb # python client
 
 It requires **Python 3.8 or later**.
 
-This example uses Python 3.8.11 on Windows and Python 3.9 on Macos
+This example works Python 3.8.11 on Windows and Python 3.9 on Macos here.
 
 
 ## Documentation Guidelines
