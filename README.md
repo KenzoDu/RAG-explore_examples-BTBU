@@ -71,7 +71,15 @@ pip install chromadb # python client
 # for javascript, npm install chromadb!
 # for client-server mode, chroma run --path /chroma_db_path
 ```
-## Files Introduction
+## Documentation Guidelines
+
+📌 **Whole Flow** :Complete full-process RAG system
+
+📌 **Two-Step Flow**:Implement the RAG system in two steps, which can be more convenient to implement
+
+📌 **liulangdiqiu.pdf**:流浪地球 Sample PDF
+
+📌 **readme**:Code guidelines
 
 
 ## Quick Start
