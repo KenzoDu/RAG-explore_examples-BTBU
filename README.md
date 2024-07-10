@@ -175,7 +175,7 @@ Persistence storage path of vector database
 ```
 persist_directory = 'your storage location/chroma_db'
 ```
-This code uses the Chroma class to convert the text list texts into vectors, stores these vectors in a collection named "RAG_chroma", the storage path is 'your storage location/chroma_db', and calls the persist method to persist the data
+This code uses the Chroma class to convert the text list texts into vectors, stores these vectors in a collection named "RAG_chroma", the storage path is 'your storage location/chroma_db'.
 ```
 from langchain_community.embeddings import OllamaEmbeddings
 from langchain_community.vectorstores import Chroma
@@ -186,7 +186,6 @@ vectorstore = Chroma.from_texts(
     collection_name="RAG_chroma",
     persist_directory=persist_directory
 )
-vectorstore.persist() 
 ```
 ### 2.Flow chart(In-production)
 
