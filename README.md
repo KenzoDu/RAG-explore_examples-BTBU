@@ -71,6 +71,13 @@ pip install chromadb # python client
 # for javascript, npm install chromadb!
 # for client-server mode, chroma run --path /chroma_db_path
 ```
+### Python version
+
+It requires **Python 3.8 or later**.
+
+This example uses Python 3.8.11 on Windows and Python 3.9 on Macos
+
+
 ## Documentation Guidelines
 
 📌 **Whole Flow** :Complete full-process RAG system
