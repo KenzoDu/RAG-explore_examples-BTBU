@@ -51,7 +51,7 @@ With conda:
 conda install langchain -c conda-forge
 ```
 ### PyMuPDF*
-**PyMuPDF** 需要 **Python 3.8或者之后的版本**,安装呢需要 **pip** :
+**PyMuPDF** 需要 **Python 3.8或者之后的版本**,安装需要 **pip** :
 #### 安装
 ```
 pip install PyMuPDF
