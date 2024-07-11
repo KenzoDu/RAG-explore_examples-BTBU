@@ -194,7 +194,7 @@ vectorstore = Chroma.from_texts(
 
 #### z.装载(可选择)
 
-如果想随时调用数据库实现问答，必须先加载数据库的内容。
+如果想随时调用数据库实现问答，必须先加载事先保存好的数据库的内容。
 
 ```
 from langchain_community.embeddings import OllamaEmbeddings
